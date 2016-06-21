@@ -1,0 +1,426 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "wasDnsName": {
+      "type": "string",
+      "defaultValue": "wasdev01",
+      "metadata": {
+        "description": "DNS name for the VM"
+      }
+    },
+    "wasVmAdminUserName": {
+      "type": "string",
+      "defaultValue": "azureuser",
+      "metadata": {
+        "description": "Admin user name for the Virtual Machine"
+      }
+    },
+    "wasVmAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password for the Virtual Machine"
+      }
+    },
+    "wasOsType": {
+      "type": "string",
+      "allowedValues": ["RedHat-7.2", "Centos-7.1", "Centos-7"],
+      "defaultValue": "RedHat-7.2",
+      "metadata": {
+        "description": "The type of the operating system you want to deploy."
+      }
+    },
+    "wasVmSize": {
+      "type": "string",
+      "defaultValue": "Standard_A1",
+      "allowedValues": [
+        "Standard_A0",
+        "Standard_A1",
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_A4",
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4"
+      ],
+      "metadata": {
+        "description": "VM Size"
+      }
+    },
+    "db2DnsName": {
+      "type": "string",
+      "defaultValue": "db2expc01",
+      "metadata": {
+        "description": "DNS name for the VM"
+      }
+    },
+    "db2VmAdminUserName": {
+      "type": "string",
+      "defaultValue": "azureuser",
+      "metadata": {
+        "description": "Admin user name for the Virtual Machines"
+      }
+    },
+    "db2VmAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password for the Virtual Machine"
+      }
+    },
+    "db2OsType": {
+      "type": "string",
+      "allowedValues": ["RedHat-7.2", "Centos-7.1", "Centos-7"],
+      "defaultValue": "RedHat-7.2",
+      "metadata": {
+        "description": "The type of the operating system you want to deploy."
+      }
+    },
+    "db2VmSize": {
+      "type": "string",
+      "defaultValue": "Standard_A1",
+      "allowedValues": [
+        "Standard_A0",
+        "Standard_A1",
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_A4",
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4"
+      ],
+      "metadata": {
+        "description": "VM Size"
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "vnet01",
+      "metadata": {
+        "description": "Name of the virtual network provisioned for the cluster"
+      }
+    },
+    "wasInstallerUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Websphere Application Server Installer URL"
+      }
+    },
+    "db2InstallerUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "DB2 Express-C Installer URL"
+      }
+    },
+    "db2DriverUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "DB2 JDBC Driver URL"
+      }
+    },
+    "databaseName": {
+      "type": "string",
+      "defaultValue": "testdb",
+      "metadata": {
+        "description": "Database name"
+      }
+    },
+    "ibmUser": {
+      "type": "string",
+      "metadata": {
+        "description": "IBM User ID"
+      }
+    },
+    "ibmPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "IBM Password"
+      }
+    }
+  },
+  "variables": {
+    "apiVersion": "2015-05-01-preview",
+    "scriptsBaseUrl": "https://raw.githubusercontent.com/kayu28/azure-templates/master/wasdev-db2expc-via-chef/",
+    "images": {
+      "RedHat-7.2": {
+        "sku": "7.2",
+        "offer": "RHEL",
+        "publisher": "RedHat",
+        "version": "latest"
+      },
+      "Centos-7.1": {
+        "sku": "7.1",
+        "offer": "CentOS",
+        "publisher": "OpenLogic",
+        "version": "latest"
+      },
+      "Centos-7": {
+        "sku": "7",
+        "offer": "CentOS",
+        "publisher": "OpenLogic",
+        "version": "latest"
+      }
+    },
+    "wasOsSettings": {
+      "imageReference": "[variables('images')[parameters('wasOsType')]]",
+      "scripts": [
+        "[concat(variables('scriptsBaseUrl'), 'chef-client.sh')]",
+        "[concat(variables('scriptsBaseUrl'), 'install-wasdev.sh')]"
+      ],
+      "commandToExecute": "[concat('bash install-wasdev.sh ', parameters('wasInstallerUrl'), ' ', parameters('ibmUser'), ' ', parameters('ibmPassword'), ' ', parameters('db2DriverUrl'), ' ', variables('db2PrivateIPAddress'), ' ', variables('wasHostDnsName'), ' ', parameters('databaseName'))]"
+    },
+    "db2OsSettings": {
+      "imageReference": "[variables('images')[parameters('wasOsType')]]",
+      "scripts": [
+        "[concat(variables('scriptsBaseUrl'), 'chef-client.sh')]",
+        "[concat(variables('scriptsBaseUrl'), 'install-db2expc.sh')]"
+      ],
+      "commandToExecute": "[concat('bash install-db2expc.sh ', parameters('db2InstallerUrl'), ' ', parameters('databaseName'))]"
+    },
+    "templateBaseUrl": "https://raw.githubusercontent.com/kayu28/azure-templates/master/wasdev-db2expc-via-chef/",
+    "templateUrl": "[concat(variables('templateBaseUrl'), 'chefclient-resources.json')]",
+    "wasVmName": "[parameters('wasDnsName')]",
+    "db2VmName": "[parameters('db2DnsName')]",
+    "storageAccountType": "Standard_LRS",
+    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'storage')]",
+    "addressPrefix": "10.0.0.0/16",
+    "subnetName": "subnet-1",
+    "subnetPrefix": "10.0.0.0/24",
+    "wasHostDnsName": "[concat(variables('wasVmName'), '.japaneast.cloudapp.azure.com')]",
+    "wasPrivateIPAddress": "10.0.0.15",
+    "db2PrivateIPAddress": "10.0.0.16",
+    "wasSecurityRules": {
+      "rules": [
+        {
+          "name": "SSH",
+          "properties": {
+            "description": "Allows SSH traffic",
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "destinationPortRange": "22",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 100,
+            "direction": "Inbound"
+          }
+        },
+        {
+          "name": "SOAP_CONNECTOR_ADDRESS",
+          "properties": {
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "destinationPortRange": "8880",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 110,
+            "direction": "Inbound"
+          }
+        },
+        {
+          "name": "WC_adminhost_secure",
+          "properties": {
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "destinationPortRange": "9043",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 120,
+            "direction": "Inbound"
+          }
+        },
+        {
+          "name": "WC_defaulthost",
+          "properties": {
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "destinationPortRange": "9080",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 130,
+            "direction": "Inbound"
+          }
+        }
+      ]
+    },
+    "db2SecurityRules": {
+      "rules": [
+        {
+          "name": "SSH",
+          "properties": {
+            "description": "Allows SSH traffic",
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "destinationPortRange": "22",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 100,
+            "direction": "Inbound"
+          }
+        },
+        {
+          "name": "DB2_PORT",
+          "properties": {
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "destinationPortRange": "50000",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 110,
+            "direction": "Inbound"
+          }
+        }
+      ]
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('apiVersion')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "accountType": "[variables('storageAccountType')]"
+      }
+    },
+    {
+      "apiVersion": "[variables('apiVersion')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "wasdev",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('templateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "dnsName": {
+            "value": "[parameters('wasDnsName')]"
+          },
+          "vmName": {
+            "value": "[variables('wasVmName')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountName')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('wasVmAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('wasVmAdminPassword')]"
+          },
+          "vmSize": {
+            "value": "[parameters('wasVmSize')]"
+          },
+          "osSettings": {
+            "value": "[variables('wasOsSettings')]"
+          },
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "securityRules": {
+            "value": "[variables('wasSecurityRules').rules]"
+          },
+          "privateIPAddress": {
+            "value": "[variables('wasPrivateIPAddress')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "db2expc",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('templateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "dnsName": {
+            "value": "[parameters('db2DnsName')]"
+          },
+          "vmName": {
+            "value": "[variables('db2VmName')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountName')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('db2VmAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('db2VmAdminPassword')]"
+          },
+          "vmSize": {
+            "value": "[parameters('db2VmSize')]"
+          },
+          "osSettings": {
+            "value": "[variables('db2OsSettings')]"
+          },
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "securityRules": {
+            "value": "[variables('db2SecurityRules').rules]"
+          },
+          "privateIPAddress": {
+            "value": "[variables('db2PrivateIPAddress')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "WebsphereAdminConsoleURL": {
+      "value": "[concat('https://', parameters('wasDnsName'), '.', 'japaneast.cloudapp.azure.com:9043/ibm/console')]",
+      "type": "string"
+    },
+    "DB2ConnectURL": {
+      "value": "[concat('jdbc:db2://', parameters('db2DnsName'), ':50000/', parameters('databaseName'))]",
+      "type": "string"
+    }
+  }
+}
