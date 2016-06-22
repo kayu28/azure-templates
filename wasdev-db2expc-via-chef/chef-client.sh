@@ -66,7 +66,6 @@ while getopts :g:c:d:n:l:h optname; do
   esac
 done
 
-# logfile=/tmp/install-chef-client.log
 exec > >(tee -ia ${LOG_FILE})
 exec 2>&1
 
