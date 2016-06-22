@@ -54,8 +54,11 @@ if [ -e /usr/lib/firewalld ]; then
   <port protocol="tcp" port="50000"/>
 </service>
 EOF
+    chmod 640 /usr/lib/firewalld/services/db2expc.xml
     systemctl restart firewalld
-    firewall-cmd --add-service=db2expc
+    firewall-cmd --add-service=db2expc --zone=public --permanent
+    firewall-cmd --reload
+    firewall-cmd --list-services --zone=public  --permanent
 fi
 
 exit 0

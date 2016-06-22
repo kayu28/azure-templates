@@ -73,8 +73,11 @@ if [ -e /usr/lib/firewalld ]; then
   <port protocol="tcp" port="8880"/>
 </service>
 EOF
+    chmod 640 /usr/lib/firewalld/services/wasdev.xml
     systemctl restart firewalld
-    firewall-cmd --add-service=wasdev
+    firewall-cmd --add-service=wasdev --zone=public --permanent
+    firewall-cmd --reload
+    firewall-cmd --list-services --zone=public --permanent
 fi
 
 exit 0

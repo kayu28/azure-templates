@@ -419,7 +419,7 @@
       "type": "string"
     },
     "DB2ConnectURL": {
-      "value": "[concat('jdbc:db2://', parameters('db2DnsName'), ':50000/', parameters('databaseName'))]",
+      "value": "[concat('jdbc:db2://', parameters('db2DnsName'), '.japaneast.cloudapp.azure.com:50000/', parameters('databaseName'))]",
       "type": "string"
     }
   }
