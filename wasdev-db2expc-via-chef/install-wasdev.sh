@@ -4,11 +4,11 @@ set -eu
 log()
 {
     echo "====================================================="
-    echo "$1"
+    echo "`date`: $1"
     echo "====================================================="
 }
 
-bash chef-client.sh "2.8.2" "0.14.25"
+bash chef-client.sh -g 2.8.2 -c 12.10.24 -d 0.14.25
 
 logfile=/tmp/install-wasdev.log
 exec > >(tee -ia ${logfile})
