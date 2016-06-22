@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eu
 
+export TERM=xterm
 BOLD=$(tput bold)
 NORM=$(tput sgr0)
 
