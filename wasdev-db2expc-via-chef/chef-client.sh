@@ -70,7 +70,7 @@ done
 exec > >(tee -ia ${LOG_FILE})
 exec 2>&1
 
-# system update
+log "System update"
 yum -y update --exclude=WALinuxAgent
 
 # set local time
