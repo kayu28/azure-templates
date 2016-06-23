@@ -70,12 +70,12 @@ done
 exec > >(tee -ia ${LOG_FILE})
 exec 2>&1
 
-log "System update"
-yum -y update --exclude=WALinuxAgent
-
 # set local time
 mv /etc/localtime /etc/localtime.bak
 ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+
+log "System update"
+yum -y update --exclude=WALinuxAgent
 
 # install git
 log "Install Git"
