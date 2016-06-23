@@ -95,6 +95,7 @@ else
     curl -L https://omnitruck.chef.io/install.sh | bash
 fi
 chef-client -v
+yum clean all
 
 # create chef-repo
 log "Create chef repository"
