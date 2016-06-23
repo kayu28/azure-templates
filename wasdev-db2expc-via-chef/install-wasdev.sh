@@ -29,12 +29,6 @@ ap_hostname=$6
 database_name=$7
 chefrepo=/var/chef/chef-repo
 
-# set hostname
-if [ $ap_hostname != "" ]; then
-    hostnamectl set-hostname $ap_hostname
-    hostname
-fi
-
 cat > ${chefrepo}/Berksfile << EOF
 source "https://api.berkshelf.com"
 cookbook "was", github: "kayu28/chef-wasdev"
@@ -56,6 +50,12 @@ normal['was']['provider']['db2driver_url'] = "$db2driver_url"
 normal['was']['datasource']['hostname']    = "$db_hostname"
 normal['was']['datasource']['database']    = "$database_name"
 EOF
+
+if [ $ap_hostname != "" ]; then
+    log "Set hostname"
+    hostnamectl set-hostname $ap_hostname
+    hostname
+fi
 
 log "Run chef client"
 env HOME=/var/chef chef-client -z -c ${chefrepo}/.chef/client.rb
