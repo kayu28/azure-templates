@@ -24,7 +24,7 @@
     },
     "wasOsType": {
       "type": "string",
-      "allowedValues": ["RedHat-7.2", "Centos-7.1", "Centos-7"],
+      "allowedValues": ["RedHat-7.2", "CentOS-7.1", "CentOS-7.2"],
       "defaultValue": "RedHat-7.2",
       "metadata": {
         "description": "The type of the operating system you want to deploy."
@@ -39,10 +39,60 @@
         "Standard_A2",
         "Standard_A3",
         "Standard_A4",
+        "Standard_A5",
+        "Standard_A6",
+        "Standard_A7",
+        "Standard_A8",
+        "Standard_A9",
+        "Standard_A10",
+        "Standard_A11",
         "Standard_D1",
+        "Standard_D1_v2",
         "Standard_D2",
+        "Standard_D2_v2",
         "Standard_D3",
-        "Standard_D4"
+        "Standard_D3_v2",
+        "Standard_D4",
+        "Standard_D4_v2",
+        "Standard_D5_v2",
+        "Standard_D11",
+        "Standard_D11_v2",
+        "Standard_D12",
+        "Standard_D12_v2",
+        "Standard_D13",
+        "Standard_D13_v2",
+        "Standard_D14",
+        "Standard_D14_v2",
+        "Standard_D15_v2",
+        "Standard_DS1",
+        "Standard_DS1_v2",
+        "Standard_DS2",
+        "Standard_DS2_v2",
+        "Standard_DS3",
+        "Standard_DS3_v2",
+        "Standard_DS4",
+        "Standard_DS4_v2",
+        "Standard_DS5_v2",
+        "Standard_DS11",
+        "Standard_DS11_v2",
+        "Standard_DS12",
+        "Standard_DS12_v2",
+        "Standard_DS13",
+        "Standard_DS13_v2",
+        "Standard_DS14",
+        "Standard_DS14_v2",
+        "Standard_DS15_v2",
+        "Standard_G1",
+        "Standard_G2",
+        "Standard_G3",
+        "Standard_G4",
+        "Standard_G5",
+        "Standard_GS1",
+        "Standard_GS2",
+        "Standard_GS3",
+        "Standard_GS4",
+        "Standard_GS4",
+        "Standard_GS5"
       ],
       "metadata": {
         "description": "VM Size"
@@ -70,7 +120,7 @@
     },
     "db2OsType": {
       "type": "string",
-      "allowedValues": ["RedHat-7.2", "Centos-7.1", "Centos-7"],
+      "allowedValues": ["RedHat-7.2", "CentOS-7.1", "CentOS-7.2"],
       "defaultValue": "RedHat-7.2",
       "metadata": {
         "description": "The type of the operating system you want to deploy."
@@ -85,10 +135,60 @@
         "Standard_A2",
         "Standard_A3",
         "Standard_A4",
+        "Standard_A5",
+        "Standard_A6",
+        "Standard_A7",
+        "Standard_A8",
+        "Standard_A9",
+        "Standard_A10",
+        "Standard_A11",
         "Standard_D1",
+        "Standard_D1_v2",
         "Standard_D2",
+        "Standard_D2_v2",
         "Standard_D3",
-        "Standard_D4"
+        "Standard_D3_v2",
+        "Standard_D4",
+        "Standard_D4_v2",
+        "Standard_D5_v2",
+        "Standard_D11",
+        "Standard_D11_v2",
+        "Standard_D12",
+        "Standard_D12_v2",
+        "Standard_D13",
+        "Standard_D13_v2",
+        "Standard_D14",
+        "Standard_D14_v2",
+        "Standard_D15_v2",
+        "Standard_DS1",
+        "Standard_DS1_v2",
+        "Standard_DS2",
+        "Standard_DS2_v2",
+        "Standard_DS3",
+        "Standard_DS3_v2",
+        "Standard_DS4",
+        "Standard_DS4_v2",
+        "Standard_DS5_v2",
+        "Standard_DS11",
+        "Standard_DS11_v2",
+        "Standard_DS12",
+        "Standard_DS12_v2",
+        "Standard_DS13",
+        "Standard_DS13_v2",
+        "Standard_DS14",
+        "Standard_DS14_v2",
+        "Standard_DS15_v2",
+        "Standard_G1",
+        "Standard_G2",
+        "Standard_G3",
+        "Standard_G4",
+        "Standard_G5",
+        "Standard_GS1",
+        "Standard_GS2",
+        "Standard_GS3",
+        "Standard_GS4",
+        "Standard_GS4",
+        "Standard_GS5"
       ],
       "metadata": {
         "description": "VM Size"
@@ -137,11 +237,18 @@
       "metadata": {
         "description": "IBM Password"
       }
+    },
+    "scriptsBaseUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/kayu28/azure-templates/master/wasdev-db2expc-via-chef/"
+    },
+    "templateBaseUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/kayu28/azure-templates/master/wasdev-db2expc-via-chef/"
     }
   },
   "variables": {
     "apiVersion": "2015-05-01-preview",
-    "scriptsBaseUrl": "https://raw.githubusercontent.com/kayu28/azure-templates/master/wasdev-db2expc-via-chef/",
     "images": {
       "RedHat-7.2": {
         "sku": "7.2",
@@ -149,14 +256,14 @@
         "publisher": "RedHat",
         "version": "latest"
       },
-      "Centos-7.1": {
+      "CentOS-7.1": {
         "sku": "7.1",
         "offer": "CentOS",
         "publisher": "OpenLogic",
         "version": "latest"
       },
-      "Centos-7": {
-        "sku": "7",
+      "CentOS-7.2": {
+        "sku": "7.2",
         "offer": "CentOS",
         "publisher": "OpenLogic",
         "version": "latest"
@@ -165,21 +272,20 @@
     "wasOsSettings": {
       "imageReference": "[variables('images')[parameters('wasOsType')]]",
       "scripts": [
-        "[concat(variables('scriptsBaseUrl'), 'chef-client.sh')]",
-        "[concat(variables('scriptsBaseUrl'), 'install-wasdev.sh')]"
+        "[concat(parameters('scriptsBaseUrl'), 'chef-client.sh')]",
+        "[concat(parameters('scriptsBaseUrl'), 'install-wasdev.sh')]"
       ],
       "commandToExecute": "[concat('bash install-wasdev.sh ', parameters('wasInstallerUrl'), ' ', parameters('ibmUser'), ' ', parameters('ibmPassword'), ' ', parameters('db2DriverUrl'), ' ', variables('db2PrivateIPAddress'), ' ', variables('wasHostDnsName'), ' ', parameters('databaseName'))]"
     },
     "db2OsSettings": {
-      "imageReference": "[variables('images')[parameters('wasOsType')]]",
+      "imageReference": "[variables('images')[parameters('db2OsType')]]",
       "scripts": [
-        "[concat(variables('scriptsBaseUrl'), 'chef-client.sh')]",
-        "[concat(variables('scriptsBaseUrl'), 'install-db2expc.sh')]"
+        "[concat(parameters('scriptsBaseUrl'), 'chef-client.sh')]",
+        "[concat(parameters('scriptsBaseUrl'), 'install-db2expc.sh')]"
       ],
       "commandToExecute": "[concat('bash install-db2expc.sh ', parameters('db2InstallerUrl'), ' ', parameters('databaseName'))]"
     },
-    "templateBaseUrl": "https://raw.githubusercontent.com/kayu28/azure-templates/master/wasdev-db2expc-via-chef/",
-    "templateUrl": "[concat(variables('templateBaseUrl'), 'chefclient-resources.json')]",
+    "templateUrl": "[concat(parameters('templateBaseUrl'), 'chefclient-resources.json')]",
     "wasVmName": "[parameters('wasDnsName')]",
     "db2VmName": "[parameters('db2DnsName')]",
     "storageAccountType": "Standard_LRS",
